@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMediaJob } from "./hooks/useMediaJob";
+import { useMediaJob } from "./hooks/useMediajob";
 import StatusBadge from "./components/StatusBadge";
 import ResultViewer from "./components/ResultViewer";
 
