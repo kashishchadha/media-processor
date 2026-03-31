@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMediaJob } from "./hooks/useMediajob";
+import { useMediaJob } from "./hooks/useMediaJob";
 import StatusBadge from "./components/StatusBadge";
 import ResultViewer from "./components/ResultViewer";
 
@@ -26,8 +26,11 @@ const OPERATIONS = [
 
 const PHASE_MESSAGES = {
   submitting: "Submitting job...",
+  queued: "Waiting in queue...",
   downloading: "Downloading media from URL...",
   processing: "Running FFmpeg...",
+  success: "Finalizing...",
+  done: "Finalizing...",
 };
 
 export default function App() {
@@ -37,6 +40,13 @@ export default function App() {
 
   const isRunning = phase === "submitting" || phase === "polling";
   const statusLabel = jobStatus ? PHASE_MESSAGES[jobStatus.status] : PHASE_MESSAGES[phase];
+
+  let progress = 0;
+  if (phase === "submitting") progress = 10;
+  else if (jobStatus?.status === "queued") progress = 15;
+  else if (jobStatus?.status === "downloading") progress = 35;
+  else if (jobStatus?.status === "processing") progress = 70;
+  else if (phase === "done" || jobStatus?.status === "success" || jobStatus?.status === "done") progress = 100;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -107,7 +117,7 @@ export default function App() {
                     const active = operation === op.value;
                     return (
                       <button
-                        key={op.value}
+                        key={op.value}setOperation
                         type="button"
                         disabled={isRunning}
                         onClick={() => setOperation(op.value)}
@@ -162,10 +172,21 @@ export default function App() {
             </form>
           </div>
 
-          {jobStatus && isRunning && (
-            <div className="animate-fade-in mt-4 flex items-center gap-3 px-4 py-3 bg-white rounded-xl border border-cream-200 shadow-card">
-              <StatusBadge status={jobStatus.status} />
-              <span className="text-xs text-ink-500 font-sans">{statusLabel}</span>
+          {isRunning && (
+            <div className="animate-fade-in mt-4 flex flex-col gap-3 p-4 bg-white rounded-xl border border-cream-200 shadow-card">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <StatusBadge status={jobStatus ? jobStatus.status : "submitting"} />
+                  <span className="text-xs text-ink-500 font-sans">{statusLabel || "Processing..."}</span>
+                </div>
+                <span className="text-xs font-bold text-ink-700 font-sans">{progress}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-cream-100 rounded-full overflow-hidden relative">
+                <div 
+                  className="h-full bg-signal transition-all duration-700 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
           )}
 

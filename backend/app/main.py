@@ -2,6 +2,7 @@ import os
 import uuid
 import asyncio
 import httpx
+import yt_dlp
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -45,7 +46,29 @@ class ProcessRequest(BaseModel):
     operation: str
 
 
+def _download_with_ytdlp(url: str, dest: Path) -> None:
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': str(dest),
+        'quiet': True,
+        'noplaylist': True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.download([url])
+        if result != 0:
+            raise Exception("yt-dlp failed to download the video")
+
 async def download_media(url: str, dest: Path) -> None:
+    supported_platforms = [
+        "youtube.com", "youtu.be", "vimeo.com", "tiktok.com", 
+        "twitter.com", "x.com", "instagram.com", "twitch.tv", 
+        "reddit.com", "facebook.com"
+    ]
+    
+    if any(domain in url for domain in supported_platforms):
+        await asyncio.to_thread(_download_with_ytdlp, url, dest)
+        return
+
     async with httpx.AsyncClient(follow_redirects=True, timeout=60.0) as client:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
