@@ -45,15 +45,18 @@ Supported operations:
 
 ## Screenshots
 
-Create a folder named `Screenshots/` in the repo root and add your images, then update the paths below.
+Create a folder named `screenshots/` in the repo root and add your images, then update the paths below.
 
 <div align="center">
 
 ### Home
-<img src="./Screenshots/Home.png" alt="Home screen" width="900" />
+<img src="./screenshots/home.png" alt="Home screen" width="900" />
 
-### Processing / Result
-<img src="./Screenshots/Result.png" alt="Result screen" width="900" />
+### Processing 
+<img src="./screenshots/image.png" alt="Processing screen" width="900" />
+
+### Result
+<img src="./screenshots/output.png" alt="result screen" width="900" />
 
 </div>
 
@@ -186,8 +189,4 @@ media-processor/
 └── docker-compose.yml
 ```
 
----
 
-## License
-
-Add your license here (MIT, Apache-2.0, etc.).
